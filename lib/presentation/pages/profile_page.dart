@@ -12,6 +12,9 @@ class ProfilePage extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     await Supabase.instance.client.auth.signOut();
     if (context.mounted) {
+      await context.read<DataRepository>().localDataSource.clearCachedBusinessData();
+    }
+    if (context.mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginPage()),
         (route) => false,
@@ -37,6 +40,7 @@ class ProfilePage extends StatelessWidget {
             builder: (context, snapshot) {
               final profile = snapshot.data;
               final name = profile?['name']?.toString() ?? 'Salesperson';
+              final profilePicUrl = profile?['profile_pic_url']?.toString();
               final phone = profile?['phone']?.toString() ?? 'Active Account';
               final email = profile?['email']?.toString() ?? '-';
               final cnic = profile?['cnic']?.toString() ?? '-';
@@ -54,15 +58,21 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   Center(
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: AppColors.brand.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.person, size: 40, color: AppColors.brand),
-                    ),
+                    child: profilePicUrl != null && profilePicUrl.isNotEmpty
+                        ? CircleAvatar(
+                            radius: 40,
+                            backgroundImage: NetworkImage(profilePicUrl),
+                            backgroundColor: AppColors.brand.withOpacity(0.1),
+                          )
+                        : Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: AppColors.brand.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.person, size: 40, color: AppColors.brand),
+                          ),
                   ),
                   const SizedBox(height: 16),
                   Center(

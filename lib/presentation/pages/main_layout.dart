@@ -18,7 +18,6 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
-  int _localRefreshVersion = 0;
   late SyncManager _syncManager;
 
   @override
@@ -38,7 +37,7 @@ class _MainLayoutState extends State<MainLayout> {
       body: ValueListenableBuilder<int>(
         valueListenable: _syncManager.syncVersion,
         builder: (context, version, _) {
-          final pageVersion = '$version-$_localRefreshVersion';
+          final pageVersion = '$version';
           final pages = [
             DashboardPage(key: ValueKey('dashboard-$pageVersion')),
             VillagesPage(key: ValueKey('villages-$pageVersion')),
@@ -83,7 +82,6 @@ class _MainLayoutState extends State<MainLayout> {
           borderRadius: BorderRadius.circular(12),
           onTap: () => setState(() {
             _currentIndex = index;
-            _localRefreshVersion++;
           }),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),

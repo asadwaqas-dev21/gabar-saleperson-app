@@ -28,7 +28,10 @@ class LocalDatabase {
   }
 
   Future<void> _onConfigure(Database db) async {
-    await db.execute('PRAGMA foreign_keys = ON');
+    // Foreign keys are turned OFF by default in SQLite.
+    // We keep them OFF because partial data syncs (like syncing customers whose villages were deleted on the server) 
+    // will cause FOREIGN KEY constraint failures and break the sync process.
+    await db.execute('PRAGMA foreign_keys = OFF');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -60,6 +63,7 @@ class LocalDatabase {
       db,
       tableName: 'salesperson_profile',
       columns: const {
+        'profile_pic_url': 'TEXT',
         'business_name': 'TEXT',
         'currency': 'TEXT',
         'receipt_footer': 'TEXT',
@@ -145,6 +149,7 @@ class LocalDatabase {
         email TEXT,
         cnic TEXT,
         address TEXT,
+        profile_pic_url TEXT,
         business_name TEXT,
         currency TEXT,
         receipt_footer TEXT,

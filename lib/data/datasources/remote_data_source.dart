@@ -25,7 +25,9 @@ class RemoteDataSource {
 
     final response = await client
         .from('salespersons')
-        .select('id, business_id, profile_id, name, phone, address, cnic, can_send_sms, can_delete_customers, can_use_offline, profiles!salespersons_profile_id_fkey(email, preferred_language), businesses(name, currency, default_language, receipt_footer)')
+        .select(
+          'id, business_id, profile_id, name, phone, address, cnic, profile_pic_url, can_send_sms, can_delete_customers, can_use_offline, profiles!salespersons_profile_id_fkey(email, preferred_language), businesses(name, currency, default_language, receipt_footer)',
+        )
         .eq('profile_id', userId)
         .single();
 
@@ -41,11 +43,14 @@ class RemoteDataSource {
       'email': profile?['email'],
       'cnic': response['cnic'],
       'address': response['address'],
+      'profile_pic_url': response['profile_pic_url'],
       'business_name': business?['name'],
       'currency': business?['currency'] ?? 'PKR',
       'receipt_footer': business?['receipt_footer'],
       'preferred_language':
-          profile?['preferred_language'] ?? business?['default_language'] ?? 'english',
+          profile?['preferred_language'] ??
+          business?['default_language'] ??
+          'english',
       'can_send_sms': response['can_send_sms'] == false ? 0 : 1,
       'can_delete_customers': response['can_delete_customers'] == true ? 1 : 0,
       'can_use_offline': response['can_use_offline'] == false ? 0 : 1,
@@ -63,28 +68,28 @@ class RemoteDataSource {
   }
 
   // --- Villages ---
-  
+
   Future<List<VillageModel>> fetchVillages() async {
     final salespersonId = await _getSalespersonId();
     final response = await client
         .from('villages')
         .select()
-        .eq('salesperson_id', salespersonId)
-        .filter('deleted_at', 'is', null);
-    
-    return response.map<VillageModel>((map) => VillageModel.fromMap(map)).toList();
+        .eq('salesperson_id', salespersonId);
+
+    return response
+        .map<VillageModel>((map) => VillageModel.fromMap(map))
+        .toList();
   }
 
   // --- Customers ---
-  
+
   Future<List<CustomerModel>> fetchCustomers() async {
     final salespersonId = await _getSalespersonId();
     final response = await client
         .from('customers')
         .select()
-        .eq('salesperson_id', salespersonId)
-        .filter('deleted_at', 'is', null);
-    
+        .eq('salesperson_id', salespersonId);
+
     return response.map<CustomerModel>((map) {
       return CustomerModel.fromMap({
         ...map,
@@ -138,19 +143,19 @@ class RemoteDataSource {
   // --- Inventory ---
 
   Future<List<ProductModel>> fetchProducts() async {
-    final response = await client
-        .from('products')
-        .select();
-    
-    return response.map<ProductModel>((map) => ProductModel.fromMap(map)).toList();
+    final response = await client.from('products').select();
+
+    return response
+        .map<ProductModel>((map) => ProductModel.fromMap(map))
+        .toList();
   }
 
   Future<List<ProductVariantModel>> fetchProductVariants() async {
-    final response = await client
-        .from('product_variants')
-        .select();
-    
-    return response.map<ProductVariantModel>((map) => ProductVariantModel.fromMap(map)).toList();
+    final response = await client.from('product_variants').select();
+
+    return response
+        .map<ProductVariantModel>((map) => ProductVariantModel.fromMap(map))
+        .toList();
   }
 
   Future<List<SalespersonInventoryModel>> fetchSalespersonInventory() async {
@@ -159,12 +164,16 @@ class RemoteDataSource {
         .from('salesperson_inventory')
         .select()
         .eq('salesperson_id', salespersonId);
-    
-    return response.map<SalespersonInventoryModel>((map) => SalespersonInventoryModel.fromMap(map)).toList();
+
+    return response
+        .map<SalespersonInventoryModel>(
+          (map) => SalespersonInventoryModel.fromMap(map),
+        )
+        .toList();
   }
 
   // --- Sync Engine Push ---
-  
+
   Future<String> pushCustomer(Map<String, dynamic> customerData) async {
     final response = await client
         .from('customers')
@@ -173,7 +182,7 @@ class RemoteDataSource {
         .single();
     return response['id'];
   }
-  
+
   Future<String> pushSale(Map<String, dynamic> saleData) async {
     final response = await client
         .from('sales')

@@ -10,6 +10,39 @@ import 'package:salesperson_app/data/models/inventory_model.dart';
 class LocalDataSource {
   Future<Database> get db async => await LocalDatabase.instance.database;
 
+  Future<void> prepareForAuthenticatedUser(String userId) async {
+    final previousUserId = await getMeta('auth_user_id');
+    if (previousUserId != null && previousUserId != userId) {
+      await clearCachedBusinessData();
+    }
+    await setMeta('auth_user_id', userId);
+  }
+
+  Future<void> clearCachedBusinessData() async {
+    final database = await db;
+    await database.transaction((txn) async {
+      final tables = [
+        'receipts',
+        'inventory_returns',
+        'sale_items',
+        'payments',
+        'sales',
+        'salesperson_inventory',
+        'product_variants',
+        'products',
+        'customers',
+        'villages',
+        'salesperson_profile',
+      ];
+
+      for (final table in tables) {
+        await txn.delete(table);
+      }
+
+      await txn.delete('app_meta', where: 'key != ?', whereArgs: ['auth_user_id']);
+    });
+  }
+
   // --- Villages ---
 
   Future<List<VillageModel>> getVillages() async {

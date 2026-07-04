@@ -8,27 +8,31 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
   DashboardBloc({required this.repository}) : super(DashboardInitial()) {
     on<LoadDashboardData>((event, emit) async {
-      emit(DashboardLoading());
-      
+      if (state is! DashboardLoaded) {
+        emit(DashboardLoading());
+      }
+
       try {
         final stats = await repository.getDashboardStats();
         final followUps = await repository.getFollowUps();
         final profile = await repository.getSalespersonProfile();
-        
-        emit(DashboardLoaded(
-          todaySales: stats['todaySales'] as double,
-          collection: stats['collection'] as double,
-          pending: stats['pending'] as double,
-          villagesCount: stats['villagesCount'] as int,
-          customersCount: stats['customersCount'] as int,
-          inventoryLeft: stats['inventoryLeft'] as int,
-          pendingSync: stats['pendingSync'] as int,
-          salespersonName:
-              profile?['name']?.toString().trim().isNotEmpty == true
-                  ? profile!['name'].toString()
-                  : 'Salesperson',
-          followUps: followUps,
-        ));
+
+        emit(
+          DashboardLoaded(
+            todaySales: stats['todaySales'] as double,
+            collection: stats['collection'] as double,
+            pending: stats['pending'] as double,
+            villagesCount: stats['villagesCount'] as int,
+            customersCount: stats['customersCount'] as int,
+            inventoryLeft: stats['inventoryLeft'] as int,
+            pendingSync: stats['pendingSync'] as int,
+            salespersonName:
+                profile?['name']?.toString().trim().isNotEmpty == true
+                ? profile!['name'].toString()
+                : 'Salesperson',
+            followUps: followUps,
+          ),
+        );
       } catch (e) {
         emit(DashboardError(e.toString()));
       }

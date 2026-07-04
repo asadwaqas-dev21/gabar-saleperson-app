@@ -18,7 +18,9 @@ class VillagesBloc extends Bloc<VillagesEvent, VillagesState> {
     LoadVillages event,
     Emitter<VillagesState> emit,
   ) async {
-    emit(VillagesLoading());
+    if (state is! VillagesLoaded) {
+      emit(VillagesLoading());
+    }
     try {
       final villages = await repository.getVillages();
       final summaries = await repository.getVillageSummaries();

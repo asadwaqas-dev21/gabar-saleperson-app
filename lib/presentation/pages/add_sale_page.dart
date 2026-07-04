@@ -40,6 +40,9 @@ class _AddSalePageState extends State<AddSalePage> {
         .read<DataRepository>()
         .localDataSource
         .getJoinedInventory();
+    
+    if (!mounted) return;
+        
     setState(() {
       _inventory = inv;
       if (_inventory.isNotEmpty) {

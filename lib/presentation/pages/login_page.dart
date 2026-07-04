@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Form
                 const Text(
-                  'PHONE OR EMAIL',
+                  'EMAIL',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
@@ -167,16 +167,16 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 12),
 
-                AppButton(
-                  text: 'Use Offline Data',
-                  type: ButtonType.light,
-                  isFullWidth: true,
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const MainLayout()),
-                    );
-                  },
-                ),
+                // AppButton(
+                //   text: 'Use Offline Data',
+                //   type: ButtonType.light,
+                //   isFullWidth: true,
+                //   onPressed: () {
+                //     Navigator.of(context).pushReplacement(
+                //       MaterialPageRoute(builder: (_) => const MainLayout()),
+                //     );
+                //   },
+                // ),
               ],
             ),
           ),

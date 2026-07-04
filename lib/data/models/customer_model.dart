@@ -16,6 +16,7 @@ class CustomerModel {
   final String syncStatus;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime? deletedAt;
 
   CustomerModel({
     this.id,
@@ -35,6 +36,7 @@ class CustomerModel {
     this.syncStatus = 'synced',
     required this.createdAt,
     required this.updatedAt,
+    this.deletedAt,
   });
 
   factory CustomerModel.fromMap(Map<String, dynamic> map) {
@@ -56,6 +58,7 @@ class CustomerModel {
       syncStatus: map['sync_status'] ?? 'synced',
       createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : DateTime.now(),
       updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : DateTime.now(),
+      deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
     );
   }
 
@@ -77,6 +80,7 @@ class CustomerModel {
       'sync_status': syncStatus,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'deleted_at': deletedAt?.toIso8601String(),
     };
     if (id != null) {
       map['server_id'] = id;
